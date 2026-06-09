@@ -270,19 +270,21 @@ const formatStringDate = (dateStr) => {
           </select>
         </div>
 
-        <div class="flex items-center gap-2.5 shrink-0">
+        <div class="flex items-center gap-2.5 shrink-0 w-full sm:w-auto">
           <button
             @click="isNewBoardModalOpen = true"
-            class="bg-white border border-slate-200 hover:border-slate-300 text-slate-700 px-4 py-2.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer"
+            class="flex-1 sm:flex-none bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 px-3 py-2.5 rounded-xl text-xs font-semibold inline-flex items-center justify-center gap-2 transition-all cursor-pointer"
           >
-            <Plus class="w-4 h-4" /><span class="hidden xs:inline">Нова дошка</span>
+            <FolderPlus class="w-4 h-4 text-slate-400 shrink-0" />
+            <span>Нова дошка</span>
           </button>
 
           <button
             @click="openCreateModal('todo')"
-            class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
+            class="flex-1 sm:flex-none bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2.5 rounded-xl text-xs font-semibold inline-flex items-center justify-center gap-2 transition-all shadow-md shadow-indigo-600/10 cursor-pointer"
           >
-            <Plus class="w-4 h-4" /> <span class="hidden xs:inline">Додати завдання</span>
+            <PlusCircle class="w-4 h-4 shrink-0" />
+            <span>Завдання</span>
           </button>
 
           <button
@@ -290,7 +292,7 @@ const formatStringDate = (dateStr) => {
             class="bg-slate-100 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-100 text-slate-400 border border-transparent px-3 py-2.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1 transition-all cursor-pointer"
             title="Видалити цю дошку"
           >
-            <Trash2 class="w-3.5 h-3.5" />
+            <Trash2 class="w-3.5 h-3.5 shrink-0" />
           </button>
         </div>
       </div>
