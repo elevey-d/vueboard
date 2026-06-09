@@ -10,7 +10,7 @@ export const useBoardStore = defineStore('board', () => {
 
   const defaultBoards = []
 
-  // Стан (State)
+  // Стан
   const boards = ref(savedBoards ? JSON.parse(savedBoards) : defaultBoards)
   const activeBoardId = ref(
     savedActiveBoardId && boards.value.length > 0
@@ -83,15 +83,13 @@ export const useBoardStore = defineStore('board', () => {
         message_text: `Ви успішно створили нову робочу дошку проєктів "${title}" у системі ProjectFlow.`,
       })
       if (success) {
-        notificationStore.addNotification(
-          `📧 Реальний лист успішно надіслано на ${userStore.email}!`,
-        )
+        notificationStore.addNotification(`Лист успішно надіслано на ${userStore.email}!`)
       } else {
-        notificationStore.addNotification(`❌ Лист на пошту не пішов через помилку API.`, 'error')
+        notificationStore.addNotification(`Лист на пошту не пішов через помилку API.`, 'error')
       }
     } else {
       notificationStore.addNotification(
-        `📋 Створено нову робочу дошку "${title}" (Email-сповіщення вимкнені)`,
+        `Створено нову робочу дошку "${title}" (Email-сповіщення вимкнені)`,
       )
     }
   }
@@ -104,7 +102,7 @@ export const useBoardStore = defineStore('board', () => {
 
       const notificationStore = useNotificationStore()
       notificationStore.addNotification(
-        `✏️ Проєкт перейменовано: "${oldTitle}" тепер називається "${board.title}"`,
+        `Проєкт перейменовано: "${oldTitle}" тепер називається "${board.title}"`,
         'info',
       )
     }
@@ -121,7 +119,7 @@ export const useBoardStore = defineStore('board', () => {
       }
 
       const notificationStore = useNotificationStore()
-      notificationStore.addNotification(`🗑️ Видалено робочий проєкт "${deletedTitle}"`)
+      notificationStore.addNotification(`Видалено робочий проєкт "${deletedTitle}"`)
     }
   }
 
@@ -156,10 +154,7 @@ export const useBoardStore = defineStore('board', () => {
           : userStore.emailNotificationsEnabled
 
       if (isEmailEnabled && String(isEmailEnabled) !== 'false') {
-        notificationStore.addToastOnly(
-          `⏳ Сповіщаємо виконавця ${recipientName} по email...`,
-          'info',
-        )
+        notificationStore.addToastOnly(`Сповіщаємо виконавця ${recipientName} по email...`, 'info')
         const success = await sendRealEmail(recipientEmail, {
           recipient_name: recipientName,
           name: recipientName,
@@ -167,18 +162,16 @@ export const useBoardStore = defineStore('board', () => {
           message_text: `Вас призначено виконавцем нового завдання: "${title}". Постановник: ${reporter}. Дедлайн: ${formatStoreDate(deadline)}.`,
         })
         if (success) {
-          notificationStore.addNotification(
-            `📧 Лист-запрошення доставлено на пошту ${recipientEmail}!`,
-          )
+          notificationStore.addNotification(`Повідомлення доставлено на пошту ${recipientEmail}!`)
         } else {
           notificationStore.addNotification(
-            `❌ Не вдалося надіслати email через збій мережі.`,
+            `Не вдалося надіслати email через збій мережі.`,
             'error',
           )
         }
       } else {
         notificationStore.addNotification(
-          `📌 Завдання "${title}" закріплено за ${recipientName} (Email-сповіщення вимкнені)`,
+          `Завдання "${title}" закріплено за ${recipientName} (Email-сповіщення вимкнені)`,
         )
       }
     }
@@ -216,7 +209,7 @@ export const useBoardStore = defineStore('board', () => {
         if (oldColumnTitle && oldColumnTitle !== targetColumn.title) {
           const notificationStore = useNotificationStore()
           notificationStore.addNotification(
-            `📝 Status змінено: Завдання "${title}" переведено з "${oldColumnTitle}" до "${targetColumn.title}"`,
+            `Завдання "${title}" переведено з "${oldColumnTitle}" до "${targetColumn.title}"`,
             'info',
           )
         }
@@ -291,7 +284,7 @@ export const useBoardStore = defineStore('board', () => {
     deleteBoard,
     addTask,
     updateTask,
-    moveTaskDirectly, // ← експортовано функціонал
+    moveTaskDirectly,
     deleteTask,
     clearColumn,
     sortColumnByDeadline,

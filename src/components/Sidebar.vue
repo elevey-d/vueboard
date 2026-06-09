@@ -3,7 +3,7 @@ import { LayoutDashboard, CheckSquare, Users, Settings, LogOut } from '@lucide/v
 import { useUserStore } from '@/stores/userStore'
 import { useAuthStore } from '@/stores/authStore'
 import { useRoute } from 'vue-router'
-import { X } from '@lucide/vue' // Додаємо іконку закриття
+import { X } from '@lucide/vue'
 
 // Приймаємо пропс для керування видимістю на мобільних
 defineProps(['isOpen'])
@@ -34,11 +34,11 @@ const menuItems = [
   >
     <div class="p-8 flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <div
-          class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center font-black text-xl tracking-tighter shadow-lg shadow-indigo-600/20 text-white"
-        >
-          P
-        </div>
+        <img
+          src="@/assets/logo.png"
+          alt="ProjectFlow Logo"
+          class="w-10 h-10 rounded-xl object-cover shadow-md shadow-indigo-500/10 shrink-0"
+        />
         <span class="font-bold text-xl tracking-tight text-white">ProjectFlow</span>
       </div>
       <button

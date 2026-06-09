@@ -31,7 +31,7 @@ export const useUserStore = defineStore('user', () => {
       localStorage.getItem('projectflow_current_email') || 'danil.klimovskiy@gmail.com'
   }
 
-  // Визначаємо поточного залогіненого юзера
+  // Визначаємо поточного залогіненого користувача
   const currentUser = computed(() => {
     return (
       usersList.value.find((u) => u.email.toLowerCase() === currentEmail.value.toLowerCase()) ||
@@ -63,7 +63,6 @@ export const useUserStore = defineStore('user', () => {
     localStorage.getItem('projectflow_email_notifications') !== 'false',
   )
 
-  // ВІДНОВЛЕНО ТA ОПТИМІЗОВАНО: Тепер вкладка «Команда» рендерить СТРОГО реальних юзерів із бази!
   const team = computed(() => {
     return usersList.value.map((user) => ({
       name: user.name,
@@ -106,7 +105,7 @@ export const useUserStore = defineStore('user', () => {
     }
 
     localStorage.setItem('projectflow_current_email', cleanedEmail)
-    loadUsers() // Перераховуємо команду миттєво
+    loadUsers()
   }
 
   const updateAvatar = (base64Image) => {
@@ -118,7 +117,7 @@ export const useUserStore = defineStore('user', () => {
       allUsers[userIndex].avatar = base64Image
       localStorage.setItem('projectflow_users', JSON.stringify(allUsers))
     }
-    loadUsers() // Перераховуємо команду миттєво
+    loadUsers()
   }
 
   return {

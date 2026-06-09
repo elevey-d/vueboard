@@ -1,9 +1,9 @@
-const SERVICE_ID = 'service_lao0vzh' // Заміни на свій ID сервісу
-const TEMPLATE_ID = 'template_owcsvqr' // Заміни на свій ID шаблону
-const PUBLIC_KEY = 'TbMuuhDP2gCfEc2tQ' // Заміни на свій Public Key
+const SERVICE_ID = 'service_lao0vzh'
+const TEMPLATE_ID = 'template_owcsvqr'
+const PUBLIC_KEY = 'TbMuuhDP2gCfEc2tQ'
 
 /**
- * Відправка реального листа через EmailJS API
+ * Відправка  листа через EmailJS API
  * @param {string} toEmail - Пошта отримувача
  * @param {object} templateParams - Параметри, які чекає шаблон (імена, тексти)
  */
@@ -34,7 +34,7 @@ export const sendRealEmail = async (toEmail, templateParams) => {
 
     return true
   } catch (error) {
-    console.error('Не вдалося надіслати лист через EmailJS:', error)
+    console.error('Не вдалося надіслати лист:', error)
     return false
   }
 }

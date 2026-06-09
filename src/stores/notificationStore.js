@@ -30,11 +30,11 @@ export const useNotificationStore = defineStore('notification', () => {
       message,
       type,
       timestamp: new Date().toISOString(),
-      isRead: false, // По замовчуванню сповіщення непрочитане
+      isRead: false,
     })
   }
 
-  // НОВИЙ МЕТОД: Позначити конкретне сповіщення як прочитане
+  // Позначити конкретне сповіщення як прочитане
   const markAsRead = (id) => {
     const log = history.value.find((t) => t.id === id)
     if (log) {
@@ -42,7 +42,7 @@ export const useNotificationStore = defineStore('notification', () => {
     }
   }
 
-  // НОВИЙ МЕТОД: Видалити конкретне сповіщення з журналу
+  // Видалити конкретне сповіщення з журналу
   const deleteLog = (id) => {
     history.value = history.value.filter((t) => t.id !== id)
   }
@@ -51,7 +51,7 @@ export const useNotificationStore = defineStore('notification', () => {
     history.value = []
   }
 
-  // КОРЕКТНИЙ UX ЛІЧИЛЬНИК: Рахує тільки НЕПРОЧИТАНІ сповіщення
+  // Лічильник, рахує тільки непрочитані сповіщення
   const unreadCount = computed(() => {
     return history.value.filter((t) => !t.isRead).length
   })

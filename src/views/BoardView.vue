@@ -14,7 +14,6 @@ import {
   Check,
   X,
   KanbanSquare,
-  LayoutGrid,
   AlignLeft,
   ChevronDown,
   FolderPlus,
@@ -77,24 +76,24 @@ const handleDragChange = (event, columnTitle) => {
   if (event.added) {
     const task = event.added.element
     notificationStore.addNotification(
-      `🔄 Перетягування: Завдання "${task.title}" переміщено в статус "${columnTitle}"`,
+      `Завдання "${task.title}" переміщено в статус "${columnTitle}"`,
       'info',
     )
   }
 }
 
-// НОВИЙ МЕТОД: Перемикання колонок з модального вікна за два кліки
+// Перемикання колонок з модального вікна за два кліки
 const handleStatusChange = (taskId, currentColumnId, event) => {
   const targetColId = event.target.value
   if (currentColumnId === targetColId) return
 
   boardStore.moveTaskDirectly(taskId, currentColumnId, targetColId)
-  targetColumnId.value = targetColId // Синхронізуємо локальний вказівник
-  isModalOpen.value = false // М'яко закриваємо вікно для оновлення списків
+  targetColumnId.value = targetColId
+  isModalOpen.value = false
 
   const targetColumnTitle = boardStore.columns.find((c) => c.id === targetColId)?.title
   notificationStore.addNotification(
-    `🔄 Переміщено: Завдання "${taskTitle.value}" переміщено в статус "${targetColumnTitle}"`,
+    `Завдання "${taskTitle.value}" переміщено в статус "${targetColumnTitle}"`,
     'info',
   )
 }

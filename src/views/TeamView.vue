@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue'
 import { useUserStore } from '@/stores/userStore'
 import { useBoardStore } from '@/stores/boardStore'
-import { Mail, ChevronRight, X, LayoutGrid, Clock, Calendar, Briefcase, Inbox } from '@lucide/vue'
+import { Mail, ChevronRight, X, LayoutGrid, Clock, Briefcase, Inbox } from '@lucide/vue'
 
 const userStore = useUserStore()
 const boardStore = useBoardStore()

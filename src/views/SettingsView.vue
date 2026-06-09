@@ -33,10 +33,10 @@ watch(
   },
 )
 
-// Поля форми профілю (ДОДAНО КЛЮЧ ПОСАДИ)
+// Поля форми профілю
 const inputName = ref(userStore.name)
 const inputEmail = ref(userStore.email)
-const inputRole = ref(userStore.role) // ← Нове реактивне поле
+const inputRole = ref(userStore.role)
 
 const showSuccessAlert = ref(false)
 const successMessage = ref('')
@@ -96,7 +96,7 @@ const handleChangePasswordSubmit = () => {
 
   if (result.success) {
     notificationStore.addNotification(
-      '🔒 Безпека: Ви успішно змінили пароль від свого облікового запису',
+      'Ви успішно змінили пароль від свого облікового запису',
       'info',
     )
     successMessage.value = 'Пароль успішно та надійно оновлено!'
@@ -214,7 +214,7 @@ const formatLogTime = (isoString) => {
                 </h3>
                 <p class="text-xs text-slate-400 mt-0.5 leading-normal">
                   Дублювати звіти про створення нових проєктів та завдань листами на поштову
-                  скриньку через сервіс EmailJS
+                  скриньку
                 </p>
               </div>
 

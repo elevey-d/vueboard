@@ -29,7 +29,6 @@ const clearFields = () => {
   errorMessage.value = ''
 }
 
-// НОВИЙ МЕТОД: Безпечне перемикання екранів (Prettier і Vite його обожнюють)
 const switchToMode = (newMode) => {
   mode.value = newMode
   clearFields()
@@ -84,11 +83,11 @@ const handleRecovery = () => {
       ></div>
 
       <div class="flex items-center gap-3 relative z-10">
-        <div
-          class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center font-black text-xl tracking-tight shadow-md shadow-indigo-600/20"
-        >
-          P
-        </div>
+        <img
+          src="@/assets/logo.png"
+          alt="ProjectFlow Logo"
+          class="w-10 h-10 rounded-xl object-cover shadow-md shadow-indigo-500/10 shrink-0"
+        />
         <span class="font-bold text-lg tracking-tight">ProjectFlow</span>
       </div>
 
@@ -111,11 +110,11 @@ const handleRecovery = () => {
     >
       <div class="w-full max-w-[400px] flex flex-col gap-6 animate-fade-in">
         <div class="flex flex-col items-center gap-2 md:hidden mb-2">
-          <div
-            class="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center font-black text-2xl text-white shadow-lg shadow-indigo-600/20"
-          >
-            P
-          </div>
+          <img
+            src="@/assets/logo.png"
+            alt="ProjectFlow Logo"
+            class="w-12 h-12 rounded-2xl object-cover shadow-lg shadow-indigo-500/10 shrink-0"
+          />
           <span class="font-bold text-xl text-slate-900 tracking-tight">ProjectFlow</span>
         </div>
 
