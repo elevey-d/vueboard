@@ -5,28 +5,24 @@ import { useBoardStore } from '@/stores/boardStore'
 import { useUserStore } from '@/stores/userStore'
 import { useNotificationStore } from '@/stores/notificationStore'
 import Sidebar from '@/components/Sidebar.vue'
-import { Bell, Mail, Clock, Check, Eye, BellOff } from '@lucide/vue'
+import { Bell, Mail, Clock, Check, Eye, BellOff, Menu } from '@lucide/vue'
 
 const boardStore = useBoardStore()
 const userStore = useUserStore()
 const notificationStore = useNotificationStore()
 const route = useRoute()
 
-// Стан відкриття випадаючого вікна сповіщень
+// Керування мобільним меню та дропдауном
+const isSidebarOpen = ref(false)
 const isDropdownOpen = ref(false)
 
-const toggleDropdown = () => {
-  isDropdownOpen.value = !isDropdownOpen.value
-}
-
-const closeDropdown = () => {
-  isDropdownOpen.value = false
-}
+const toggleSidebar = () => (isSidebarOpen.value = !isSidebarOpen.value)
+const toggleDropdown = () => (isDropdownOpen.value = !isDropdownOpen.value)
+const closeDropdown = () => (isDropdownOpen.value = false)
 
 onMounted(() => {
   window.addEventListener('click', closeDropdown)
 })
-
 onUnmounted(() => {
   window.removeEventListener('click', closeDropdown)
 })
@@ -35,6 +31,7 @@ watch(
   () => route.path,
   () => {
     boardStore.searchQuery = ''
+    isSidebarOpen.value = false
   },
 )
 
@@ -54,7 +51,9 @@ const formatMinLogTime = (isoString) => {
     v-else
     class="flex h-screen w-screen overflow-hidden bg-slate-50/50 font-sans antialiased relative"
   >
-    <div class="fixed bottom-6 right-6 z-50 space-y-3 max-w-sm w-full pointer-events-none">
+    <div
+      class="fixed bottom-6 right-6 z-[100] space-y-3 max-w-[calc(100vw-48px)] sm:max-w-sm w-full pointer-events-none"
+    >
       <div
         v-for="toast in notificationStore.toasts"
         :key="toast.id"
@@ -69,23 +68,32 @@ const formatMinLogTime = (isoString) => {
       </div>
     </div>
 
-    <Sidebar />
+    <Sidebar :is-open="isSidebarOpen" @close="isSidebarOpen = false" />
 
     <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
       <header
-        class="h-16 bg-white border-b border-slate-200/60 flex items-center justify-between px-8 shrink-0"
+        class="h-16 bg-white border-b border-slate-200/60 flex items-center justify-between px-4 sm:px-8 shrink-0 z-30"
       >
-        <div class="w-full max-w-xs">
-          <input
-            v-if="route.name !== 'settings'"
-            v-model="boardStore.searchQuery"
-            type="text"
-            :placeholder="route.name === 'team' ? 'Пошук учасників...' : 'Швидкий пошук...'"
-            class="w-full bg-slate-100 border border-transparent px-4 py-2 rounded-xl text-sm outline-none focus:bg-white focus:border-slate-200 transition-all font-medium text-slate-700"
-          />
+        <div class="flex items-center gap-4 flex-1">
+          <button
+            @click.stop="toggleSidebar"
+            class="lg:hidden p-2 text-slate-500 hover:bg-slate-100 rounded-xl transition-all"
+          >
+            <Menu class="w-6 h-6" />
+          </button>
+
+          <div class="w-full max-w-xs hidden sm:block">
+            <input
+              v-if="route.name !== 'settings'"
+              v-model="boardStore.searchQuery"
+              type="text"
+              placeholder="Швидкий пошук..."
+              class="w-full bg-slate-100 border border-transparent px-4 py-2 rounded-xl text-sm outline-none focus:bg-white focus:border-slate-200 transition-all font-medium text-slate-700"
+            />
+          </div>
         </div>
 
-        <div class="flex items-center gap-4 relative">
+        <div class="flex items-center gap-2 sm:gap-4 relative">
           <div class="relative">
             <button
               @click.stop="toggleDropdown"
@@ -95,14 +103,14 @@ const formatMinLogTime = (isoString) => {
               <Bell class="w-5 h-5 transition-colors" />
               <span
                 v-if="notificationStore.unreadCount > 0"
-                class="absolute top-1.5 right-1.5 w-2 h-2 bg-indigo-600 rounded-full ring-2 ring-white animate-pulse"
+                class="absolute top-1.5 right-1.5 w-2 h-2 bg-indigo-600 rounded-full ring-2 ring-white"
               ></span>
             </button>
 
             <div
               v-if="isDropdownOpen"
               @click.stop
-              class="absolute right-0 mt-2 w-80 bg-white rounded-2xl border border-slate-200/80 shadow-2xl z-50 overflow-hidden animate-dropdown-in"
+              class="fixed sm:absolute top-14 sm:top-auto right-4 sm:right-0 mt-2 w-[calc(100vw-32px)] sm:w-80 bg-white rounded-2xl border border-slate-200/80 shadow-2xl z-50 overflow-hidden animate-dropdown-in"
             >
               <div
                 class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50"
@@ -144,10 +152,11 @@ const formatMinLogTime = (isoString) => {
                       >
                     </div>
                   </div>
+
                   <button
                     v-if="!log.isRead"
                     @click="notificationStore.markAsRead(log.id)"
-                    class="opacity-0 group-hover/item:opacity-100 p-1 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-md transition-all cursor-pointer shrink-0"
+                    class="opacity-100 sm:opacity-0 sm:group-hover/item:opacity-100 p-1 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-md transition-all cursor-pointer shrink-0"
                     title="Прочитано"
                   >
                     <Check class="w-3.5 h-3.5" />
@@ -172,77 +181,25 @@ const formatMinLogTime = (isoString) => {
                 @click="closeDropdown"
                 class="block text-center py-3 bg-slate-50 border-t border-slate-100 text-xs font-bold text-indigo-600 hover:text-indigo-700 transition-colors cursor-pointer group"
               >
-                <span class="inline-flex items-center gap-1"
-                  >Переглянути всі
-                  <Eye
-                    class="w-3.5 h-3.5 text-slate-400 group-hover:text-indigo-600 transition-colors"
-                /></span>
+                <span class="inline-flex items-center gap-1">Переглянути всі</span>
               </router-link>
             </div>
           </div>
 
-          <router-link
-            to="/settings"
-            class="shrink-0 block rounded-xl hover:opacity-85 active:scale-95 transition-all cursor-pointer group"
-            title="Налаштування профілю"
-          >
+          <router-link to="/settings" class="shrink-0 block">
             <img
               :src="userStore.avatar"
-              alt="User Avatar"
-              class="w-8 h-8 rounded-xl object-cover ring-2 ring-white group-hover:ring-indigo-500/50 transition-all"
+              class="w-8 h-8 rounded-xl object-cover ring-2 ring-slate-100"
             />
           </router-link>
         </div>
       </header>
 
-      <div class="flex-1 overflow-y-auto p-8 custom-scrollbar">
+      <main
+        class="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-8 custom-scrollbar bg-slate-50/30"
+      >
         <router-view />
-      </div>
+      </main>
     </div>
   </div>
 </template>
-
-<style>
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 10px;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-.animate-slide-in {
-  animation: slideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-@keyframes dropdownIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px) scale(0.97);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-.animate-dropdown-in {
-  animation: dropdownIn 0.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-</style>

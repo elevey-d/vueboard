@@ -16,6 +16,9 @@ import {
   KanbanSquare,
   LayoutGrid,
   AlignLeft,
+  ChevronDown,
+  FolderPlus,
+  PlusCircle,
 } from '@lucide/vue'
 
 const boardStore = useBoardStore()
@@ -225,7 +228,7 @@ const formatStringDate = (dateStr) => {
       <div
         class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 shrink-0 w-full"
       >
-        <div class="flex items-center gap-3 min-w-0">
+        <div class="flex-wrap flex items-center gap-3 min-w-0">
           <h1 class="text-2xl font-bold text-slate-900 tracking-tight shrink-0">Дошка проєкту</h1>
 
           <div v-if="isEditingBoardTitle" class="flex items-center gap-1.5">
@@ -272,14 +275,14 @@ const formatStringDate = (dateStr) => {
             @click="isNewBoardModalOpen = true"
             class="bg-white border border-slate-200 hover:border-slate-300 text-slate-700 px-4 py-2.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer"
           >
-            <Plus class="w-4 h-4" /> Нова дошка
+            <Plus class="w-4 h-4" /><span class="hidden xs:inline">Нова дошка</span>
           </button>
 
           <button
             @click="openCreateModal('todo')"
             class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
           >
-            <Plus class="w-4 h-4" /> Додати завдання
+            <Plus class="w-4 h-4" /> <span class="hidden xs:inline">Додати завдання</span>
           </button>
 
           <button
