@@ -25,7 +25,6 @@ const boardStore = useBoardStore()
 const userStore = useUserStore()
 const notificationStore = useNotificationStore()
 
-// Стан для редагування назви дошки
 const isEditingBoardTitle = ref(false)
 const editedBoardTitle = ref('')
 
@@ -41,18 +40,15 @@ const saveBoardTitle = () => {
   }
 }
 
-// Поточна відкрита дошка
 const currentBoard = computed(() => {
   return boardStore.boards.find((b) => b.id === boardStore.activeBoardId)
 })
 
-// Управління списками випадаючих меню дій колонок
 const activeMenuColumnId = ref(null)
 const toggleMenu = (columnId) => {
   activeMenuColumnId.value = activeMenuColumnId.value === columnId ? null : columnId
 }
 
-// Функція автоматичного закриття меню трикрапки при кліку на пусте поле
 const closeDropdownMenu = () => {
   activeMenuColumnId.value = null
 }
@@ -65,7 +61,6 @@ onUnmounted(() => {
   window.removeEventListener('click', closeDropdownMenu)
 })
 
-// Методи обробники для повної сумісності з форматуванням Prettier
 const handleSortColumn = (type, columnId) => {
   if (type === 'priority') boardStore.sortColumnByPriority(columnId)
   if (type === 'deadline') boardStore.sortColumnByDeadline(columnId)
@@ -78,7 +73,6 @@ const handleClearColumn = (columnId) => {
   activeMenuColumnId.value = null
 }
 
-// Перехоплення drag-and-drop переміщень для журналу сповіщень
 const handleDragChange = (event, columnTitle) => {
   if (event.added) {
     const task = event.added.element
@@ -89,7 +83,22 @@ const handleDragChange = (event, columnTitle) => {
   }
 }
 
-// Стан вікна створення нової дошки
+// НОВИЙ МЕТОД: Перемикання колонок з модального вікна за два кліки
+const handleStatusChange = (taskId, currentColumnId, event) => {
+  const targetColId = event.target.value
+  if (currentColumnId === targetColId) return
+
+  boardStore.moveTaskDirectly(taskId, currentColumnId, targetColId)
+  targetColumnId.value = targetColId // Синхронізуємо локальний вказівник
+  isModalOpen.value = false // М'яко закриваємо вікно для оновлення списків
+
+  const targetColumnTitle = boardStore.columns.find((c) => c.id === targetColId)?.title
+  notificationStore.addNotification(
+    `🔄 Переміщено: Завдання "${taskTitle.value}" переміщено в статус "${targetColumnTitle}"`,
+    'info',
+  )
+}
+
 const isNewBoardModalOpen = ref(false)
 const newBoardName = ref('')
 
@@ -101,9 +110,8 @@ const handleCreateBoard = () => {
   }
 }
 
-// Стан та змінні модального вікна завдань
 const isModalOpen = ref(false)
-const modalMode = ref('create') // 'create' | 'edit' | 'view'
+const modalMode = ref('create')
 
 const targetColumnId = ref('')
 const currentTaskId = ref('')
@@ -189,9 +197,7 @@ const getDateColorClass = (priority) => {
 
 const getAvatar = (name) => {
   const member = userStore.team.find((m) => m.name === name)
-  return member
-    ? member.avatar
-    : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=150'
+  return member ? member.avatar : userStore.avatar
 }
 
 const formatStringDate = (dateStr) => {
@@ -205,7 +211,7 @@ const formatStringDate = (dateStr) => {
   <div class="h-full flex flex-col w-full min-w-0 overflow-hidden">
     <div
       v-if="boardStore.boards.length === 0"
-      class="flex-1 flex flex-col items-center justify-center py-16 animate-fade-in"
+      class="flex-1 flex flex-col items-center justify-center py-16 animate-fade-in px-4"
     >
       <div
         class="w-16 h-16 bg-slate-100 text-slate-400 rounded-2xl flex items-center justify-center mb-4 border border-slate-200/40"
@@ -218,7 +224,7 @@ const formatStringDate = (dateStr) => {
       </p>
       <button
         @click="isNewBoardModalOpen = true"
-        class="mt-6 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold inline-flex items-center gap-2 transition-all shadow-md shadow-indigo-600/10 cursor-pointer"
+        class="mt-6 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold inline-flex items-center gap-2 transition-all shadow-md shadow-indigo-600/10 cursor-pointer w-full xs:w-auto justify-center"
       >
         <Plus class="w-4 h-4" /> Створити першу дошку
       </button>
@@ -226,9 +232,9 @@ const formatStringDate = (dateStr) => {
 
     <div v-else class="flex-1 flex flex-col min-h-0 w-full overflow-hidden">
       <div
-        class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 shrink-0 w-full"
+        class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 shrink-0 w-full px-1"
       >
-        <div class="flex-wrap flex items-center gap-3 min-w-0">
+        <div class="flex flex-wrap items-center gap-3 min-w-0">
           <h1 class="text-2xl font-bold text-slate-900 tracking-tight shrink-0">Дошка проєкту</h1>
 
           <div v-if="isEditingBoardTitle" class="flex items-center gap-1.5">
@@ -256,15 +262,15 @@ const formatStringDate = (dateStr) => {
           <div
             v-else
             @click="startEditingTitle(currentBoard?.title)"
-            class="bg-slate-100 text-slate-500 font-semibold text-xs px-3 py-1.5 rounded-xl border border-slate-200/40 cursor-pointer hover:bg-slate-200/60 transition-colors flex items-center gap-1"
+            class="bg-slate-100 text-slate-500 font-semibold text-xs px-3 py-1.5 rounded-xl border border-slate-200/40 cursor-pointer hover:bg-slate-200/60 transition-colors flex items-center gap-1 max-w-[160px] xs:max-w-none truncate"
           >
-            <span>{{ currentBoard?.title }}</span>
-            <Edit2 class="w-2.5 h-2.5 text-slate-400" />
+            <span class="truncate">{{ currentBoard?.title }}</span>
+            <Edit2 class="w-2.5 h-2.5 text-slate-400 shrink-0" />
           </div>
 
           <select
             v-model="boardStore.activeBoardId"
-            class="bg-white border border-slate-200 px-2 py-1 rounded-lg text-xs font-semibold text-slate-400 outline-none focus:border-slate-300 transition-all cursor-pointer"
+            class="bg-white border border-slate-200 px-2 py-1 rounded-lg text-xs font-semibold text-slate-400 outline-none focus:border-slate-300 transition-all cursor-pointer max-w-[120px] xs:max-w-none"
           >
             <option v-for="b in boardStore.boards" :key="b.id" :value="b.id">{{ b.title }}</option>
           </select>
@@ -289,7 +295,7 @@ const formatStringDate = (dateStr) => {
 
           <button
             @click="boardStore.deleteBoard(boardStore.activeBoardId)"
-            class="bg-slate-100 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-100 text-slate-400 border border-transparent px-3 py-2.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1 transition-all cursor-pointer"
+            class="bg-slate-100 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-100 text-slate-400 border border-transparent px-3 py-2.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1 transition-all cursor-pointer shrink-0"
             title="Видалити цю дошку"
           >
             <Trash2 class="w-3.5 h-3.5 shrink-0" />
@@ -297,12 +303,12 @@ const formatStringDate = (dateStr) => {
         </div>
       </div>
 
-      <div class="flex-1 w-full overflow-x-auto custom-scrollbar">
-        <div class="flex gap-6 pb-4 items-start pr-4">
+      <div class="flex-1 w-full overflow-x-auto custom-scrollbar snap-x snap-mandatory">
+        <div class="flex gap-6 pb-4 items-start pr-4 pl-1">
           <div
             v-for="column in boardStore.columns"
             :key="column.id"
-            class="w-72 max-h-full bg-slate-100/70 border border-slate-200/50 rounded-2xl p-4 flex flex-col shrink-0"
+            class="w-[288px] xs:w-[310px] sm:w-72 max-h-full bg-slate-100/70 border border-slate-200/50 rounded-2xl p-4 flex flex-col shrink-0 snap-center"
           >
             <div class="flex justify-between items-center mb-4 shrink-0 px-1">
               <div class="flex items-center gap-2">
@@ -437,7 +443,7 @@ const formatStringDate = (dateStr) => {
 
     <div
       v-if="isNewBoardModalOpen"
-      class="fixed inset-0 bg-slate-950/40 backdrop-blur-xs flex items-center justify-center z-50 animate-fade-in"
+      class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 animate-fade-in"
       @click="isNewBoardModalOpen = false"
     >
       <div
@@ -479,11 +485,11 @@ const formatStringDate = (dateStr) => {
 
     <div
       v-if="isModalOpen && modalMode === 'view'"
-      class="fixed inset-0 bg-slate-950/40 backdrop-blur-xs flex items-center justify-center z-50 animate-fade-in"
+      class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 animate-fade-in"
       @click="isModalOpen = false"
     >
       <div
-        class="bg-white rounded-2xl p-6 w-full max-w-md mx-4 shadow-2xl relative animate-scale-up flex flex-col gap-5"
+        class="bg-white rounded-2xl p-5 sm:p-6 w-full max-w-md mx-4 shadow-2xl relative animate-scale-up flex flex-col gap-5 max-h-[90vh] overflow-y-auto custom-scrollbar"
         @click.stop
       >
         <div class="flex justify-between items-start gap-4">
@@ -499,26 +505,45 @@ const formatStringDate = (dateStr) => {
         </div>
 
         <div
-          class="flex items-center justify-between bg-slate-50/40 p-1.5 rounded-xl border border-slate-100"
+          class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50/60 p-3 rounded-2xl border border-slate-100"
         >
-          <div
-            class="flex items-center gap-1.5 text-xs font-bold text-slate-400 bg-slate-100/80 px-2.5 py-1.5 rounded-lg"
-          >
-            <LayoutGrid class="w-3.5 h-3.5 text-slate-400" />
-            <span>СТАТУС:</span>
-            <span class="text-slate-600 font-semibold ml-0.5">
-              {{ boardStore.columns.find((c) => c.id === targetColumnId)?.title }}
-            </span>
+          <div class="space-y-1">
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider"
+              >Статус завдання</label
+            >
+            <div class="relative flex items-center">
+              <select
+                :value="targetColumnId"
+                @change="handleStatusChange(currentTaskId, targetColumnId, $event)"
+                class="w-full bg-white border border-slate-200/80 pl-3 pr-8 py-1.5 rounded-xl text-xs font-bold text-slate-700 outline-none focus:border-indigo-500 transition-all appearance-none cursor-pointer"
+              >
+                <option v-for="col in boardStore.columns" :key="col.id" :value="col.id">
+                  {{ col.title }}
+                </option>
+              </select>
+              <ChevronDown
+                class="w-3.5 h-3.5 text-slate-400 absolute right-2.5 pointer-events-none"
+              />
+            </div>
           </div>
-          <span
-            :class="getPriorityClass(taskPriority)"
-            class="text-xs font-bold px-3 py-1 rounded-lg border"
-          >
-            {{ taskPriority }}
-          </span>
+
+          <div class="space-y-1">
+            <label
+              class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider sm:text-right"
+              >Пріоритет</label
+            >
+            <div class="sm:text-right pt-0.5">
+              <span
+                :class="getPriorityClass(taskPriority)"
+                class="text-xs font-bold px-3 py-1 rounded-xl border inline-block"
+              >
+                {{ taskPriority }}
+              </span>
+            </div>
+          </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-4 pb-1">
+        <div class="grid grid-cols-1 xs:grid-cols-2 gap-4 pb-1">
           <div>
             <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2"
               >Постановник</span
@@ -552,7 +577,7 @@ const formatStringDate = (dateStr) => {
             <AlignLeft class="w-3.5 h-3.5" /> Опис завдання
           </span>
           <div
-            class="bg-slate-50/70 border border-slate-100 p-3.5 rounded-xl text-sm text-slate-600 leading-relaxed min-h-[60px]"
+            class="bg-slate-50/70 border border-slate-100 p-3.5 rounded-xl text-sm text-slate-600 leading-relaxed min-h-[60px] whitespace-pre-wrap"
           >
             {{ taskDescription || 'Опис відсутній...' }}
           </div>
@@ -577,7 +602,6 @@ const formatStringDate = (dateStr) => {
           >
             <Trash2 class="w-4 h-4" /> Видалити
           </button>
-
           <button
             @click="switchToEditMode"
             class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-md shadow-indigo-600/10 cursor-pointer"
@@ -590,11 +614,11 @@ const formatStringDate = (dateStr) => {
 
     <div
       v-if="isModalOpen && (modalMode === 'create' || modalMode === 'edit')"
-      class="fixed inset-0 bg-slate-950/40 backdrop-blur-xs flex items-center justify-center z-50 animate-fade-in"
+      class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 animate-fade-in"
       @click="isModalOpen = false"
     >
       <div
-        class="bg-white rounded-2xl p-6 w-full max-w-md mx-4 shadow-2xl relative animate-scale-up"
+        class="bg-white rounded-2xl p-5 sm:p-6 w-full max-w-md mx-4 shadow-2xl relative animate-scale-up max-h-[90vh] overflow-y-auto custom-scrollbar"
         @click.stop
       >
         <div class="flex justify-between items-center mb-4">

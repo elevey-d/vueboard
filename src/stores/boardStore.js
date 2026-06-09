@@ -8,12 +8,10 @@ export const useBoardStore = defineStore('board', () => {
   const savedBoards = localStorage.getItem('projectflow_boards')
   const savedActiveBoardId = localStorage.getItem('projectflow_active_board_id')
 
-  // ГРАНИЧНА ВИМОГА: Спочатку додаток повністю порожній
   const defaultBoards = []
 
   // Стан (State)
   const boards = ref(savedBoards ? JSON.parse(savedBoards) : defaultBoards)
-  // Якщо збереженого ID немає або масив порожній — ставимо null
   const activeBoardId = ref(
     savedActiveBoardId && boards.value.length > 0
       ? savedActiveBoardId
@@ -23,7 +21,6 @@ export const useBoardStore = defineStore('board', () => {
   )
   const searchQuery = ref('')
 
-  // Внутрішній безпечний помічник форматування дати для листів
   const formatStoreDate = (dateStr) => {
     if (!dateStr) return 'Не вказано'
     try {
@@ -34,7 +31,6 @@ export const useBoardStore = defineStore('board', () => {
     }
   }
 
-  // Колонки активної дошки (Бережно обробляємо випадок null)
   const columns = computed(() => {
     if (!activeBoardId.value) return []
     const board = boards.value.find((b) => b.id === activeBoardId.value)
@@ -100,7 +96,6 @@ export const useBoardStore = defineStore('board', () => {
     }
   }
 
-  // НОВА ЛОГІКА: Перейменування існуючої дошки
   const updateBoardTitle = (boardId, newTitle) => {
     const board = boards.value.find((b) => b.id === boardId)
     if (board && newTitle.trim()) {
@@ -115,14 +110,12 @@ export const useBoardStore = defineStore('board', () => {
     }
   }
 
-  // ОНОВЛЕНО: Видалення дошки (можна видалити геть усе)
   const deleteBoard = (boardId) => {
     const index = boards.value.findIndex((b) => b.id === boardId)
     if (index !== -1) {
       const deletedTitle = boards.value[index].title
       boards.value.splice(index, 1)
 
-      // Якщо видалили активну дошку, перемикаємо на першу ліворуч, або в null
       if (activeBoardId.value === boardId) {
         activeBoardId.value = boards.value.length > 0 ? boards.value[0].id : null
       }
@@ -223,10 +216,27 @@ export const useBoardStore = defineStore('board', () => {
         if (oldColumnTitle && oldColumnTitle !== targetColumn.title) {
           const notificationStore = useNotificationStore()
           notificationStore.addNotification(
-            `📝 Статус змінено: Завдання "${title}" переведено з "${oldColumnTitle}" до "${targetColumn.title}"`,
+            `📝 Status змінено: Завдання "${title}" переведено з "${oldColumnTitle}" до "${targetColumn.title}"`,
             'info',
           )
         }
+      }
+    }
+  }
+
+  // НОВИЙ МЕТОД: Кліковий перенос завдань (Tap-to-Move) для смартфонів
+  const moveTaskDirectly = (taskId, fromColumnId, toColumnId) => {
+    if (fromColumnId === toColumnId) return
+
+    const sourceColumn = columns.value.find((c) => c.id === fromColumnId)
+    const targetColumn = columns.value.find((c) => c.id === toColumnId)
+
+    if (sourceColumn && targetColumn) {
+      const taskIndex = sourceColumn.tasks.findIndex((t) => t.id === taskId)
+      if (taskIndex !== -1) {
+        const [task] = sourceColumn.tasks.splice(taskIndex, 1)
+        targetColumn.tasks.push(task)
+        localStorage.setItem('projectflow_boards', JSON.stringify(boards.value))
       }
     }
   }
@@ -277,10 +287,11 @@ export const useBoardStore = defineStore('board', () => {
     columns,
     searchQuery,
     addBoard,
-    updateBoardTitle, // ← новий метод експортовано
+    updateBoardTitle,
     deleteBoard,
     addTask,
     updateTask,
+    moveTaskDirectly, // ← експортовано функціонал
     deleteTask,
     clearColumn,
     sortColumnByDeadline,
