@@ -33,7 +33,6 @@ watch(
   },
 )
 
-// Поля форми профілю
 const inputName = ref(userStore.name)
 const inputEmail = ref(userStore.email)
 const inputRole = ref(userStore.role)
@@ -64,7 +63,6 @@ const handleAvatarUpload = (event) => {
 
 const handleSaveSettings = () => {
   if (!inputName.value.trim() || !inputEmail.value.trim() || !inputRole.value.trim()) return
-  // Передаємо три параметри у метод оновлення
   userStore.updateProfile(inputName.value, inputEmail.value, inputRole.value)
   successMessage.value = 'Налаштування профілю успішно збережено!'
   showSuccessAlert.value = true
@@ -96,7 +94,7 @@ const handleChangePasswordSubmit = () => {
 
   if (result.success) {
     notificationStore.addNotification(
-      'Ви успішно змінили пароль від свого облікового запису',
+      '🔒 Безпека: Ви успішно змінили пароль від свого облікового запису',
       'info',
     )
     successMessage.value = 'Пароль успішно та надійно оновлено!'
@@ -125,7 +123,7 @@ const formatLogTime = (isoString) => {
 </script>
 
 <template>
-  <div class="max-w-2xl mx-auto relative">
+  <div class="max-w-2xl mx-auto relative px-4 sm:px-0">
     <div
       v-if="showSuccessAlert"
       class="fixed top-6 right-6 bg-emerald-600 text-white px-5 py-3 rounded-xl font-semibold shadow-lg shadow-emerald-600/20 z-50 animate-fade-in flex items-center gap-2 text-sm"
@@ -133,6 +131,7 @@ const formatLogTime = (isoString) => {
       <span>{{ successMessage }}</span>
     </div>
 
+    <!-- ================= СЕКЦІЯ 1: ПРОФІЛЬ КОРИСТУВАЧА ================= -->
     <div v-if="currentSection === 'profile'" class="space-y-6 animate-fade-in">
       <div class="mb-8">
         <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Налаштування</h1>
@@ -214,7 +213,7 @@ const formatLogTime = (isoString) => {
                 </h3>
                 <p class="text-xs text-slate-400 mt-0.5 leading-normal">
                   Дублювати звіти про створення нових проєктів та завдань листами на поштову
-                  скриньку
+                  скриньку через сервіс EmailJS
                 </p>
               </div>
 
@@ -253,7 +252,7 @@ const formatLogTime = (isoString) => {
         >
           <div class="flex items-center gap-3 text-slate-700 font-medium text-sm">
             <Bell class="w-4 h-4 text-slate-400 group-hover:text-indigo-600 transition-colors" />
-            Сповіщення
+            <span>Сповіщення</span>
             <span
               v-if="notificationStore.unreadCount > 0"
               class="ml-1 bg-indigo-600 text-white font-bold text-[10px] px-2 py-0.5 rounded-full ring-4 ring-indigo-50"
@@ -270,7 +269,7 @@ const formatLogTime = (isoString) => {
         >
           <div class="flex items-center gap-3 text-slate-700 font-medium text-sm">
             <Lock class="w-4 h-4 text-slate-400 group-hover:text-indigo-600 transition-colors" />
-            Зміна паролю
+            <span>Зміна паролю</span>
           </div>
           <ChevronRight class="w-4 h-4 text-slate-300" />
         </button>
@@ -286,22 +285,30 @@ const formatLogTime = (isoString) => {
       </div>
     </div>
 
-    <div v-else-if="currentSection === 'notifications'" class="space-y-6 animate-fade-in">
-      <div class="flex justify-between items-center mb-6">
+    <!-- ================= СЕКЦІЯ 2: ЖУРНАЛ АКТИВНОСТІ (ВИПРАВЛЕНИЙ НАВБАР) ================= -->
+    <div v-else-if="currentSection === 'notifications'" class="space-y-6 animate-fade-in w-full">
+      <!-- ОНОВЛЕНО: Ідеально рівна суцільна лінія навігації без громіздких фонів -->
+      <div
+        class="flex flex-row items-center justify-between w-full pb-3 border-b border-slate-200/60 mb-5 mt-1"
+      >
         <button
           @click="currentSection = 'profile'"
-          class="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-800 transition-colors cursor-pointer group"
+          class="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-800 transition-colors cursor-pointer group shrink-0"
         >
-          <ArrowLeft class="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" /> Назад до
-          налаштувань
+          <ArrowLeft class="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+          <span>Назад<span class="hidden min-[400px]:inline"> до налаштувань</span></span>
         </button>
 
         <button
           v-if="notificationStore.history.length > 0"
           @click="notificationStore.clearHistory"
-          class="text-xs font-bold text-rose-600 hover:bg-rose-50 px-3 py-1.5 rounded-xl transition-colors inline-flex items-center gap-1.5 cursor-pointer"
+          class="text-xs font-bold text-rose-600 hover:text-rose-700 transition-colors inline-flex items-center gap-1.5 cursor-pointer shrink-0"
         >
-          <Trash2 class="w-3.5 h-3.5" /> Очистити весь журнал
+          <Trash2 class="w-3.5 h-3.5 shrink-0" />
+          <span
+            >Очистити <span class="hidden min-[400px]:inline">весь журнал</span
+            ><span class="min-[400px]:hidden">все</span></span
+          >
         </button>
       </div>
 
@@ -314,13 +321,13 @@ const formatLogTime = (isoString) => {
 
       <div
         v-if="notificationStore.history.length > 0"
-        class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-2xs divide-y divide-slate-100 max-h-[520px] overflow-y-auto custom-scrollbar"
+        class="w-full bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-2xs divide-y divide-slate-100 max-h-[520px] overflow-y-auto custom-scrollbar"
       >
         <div
           v-for="log in notificationStore.history"
           :key="log.id"
-          class="p-4 flex items-start justify-between gap-4 transition-all group/log relative"
-          :class="!log.isRead ? 'bg-indigo-50/25 border-l-2 border-indigo-600 p-3.5' : 'bg-white'"
+          class="p-4 flex items-center justify-between gap-4 transition-all group/log relative w-full"
+          :class="!log.isRead ? 'bg-indigo-50/25 border-l-2 border-indigo-600 pl-3.5' : 'bg-white'"
         >
           <div class="flex items-start gap-3.5 flex-1 min-w-0">
             <div class="mt-0.5 relative shrink-0">
@@ -332,8 +339,9 @@ const formatLogTime = (isoString) => {
                 class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-indigo-600 rounded-full ring-2 ring-white"
               ></span>
             </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-sm font-medium leading-relaxed pr-2 text-slate-700">
+
+            <div class="flex-1 min-w-0 pr-1">
+              <p class="text-sm font-medium leading-relaxed text-slate-700 break-words">
                 {{ log.message }}
               </p>
               <div class="flex items-center gap-1 text-[11px] text-slate-400 font-medium mt-1.5">
@@ -344,20 +352,20 @@ const formatLogTime = (isoString) => {
           </div>
 
           <div
-            class="flex items-center gap-1 shrink-0 opacity-0 group-hover/log:opacity-100 transition-opacity bg-gradient-to-l from-white via-white pl-4 z-10"
+            class="flex items-center gap-1 shrink-0 opacity-100 sm:opacity-0 sm:group-hover/log:opacity-100 transition-opacity pl-1 z-10"
           >
             <button
               v-if="!log.isRead"
               @click="notificationStore.markAsRead(log.id)"
-              class="p-1.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-2xl transition-all cursor-pointer"
+              class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all cursor-pointer bg-slate-50 sm:bg-transparent"
               title="Позначити як прочитане"
             >
               <Check class="w-4 h-4" />
             </button>
             <button
               @click="notificationStore.deleteLog(log.id)"
-              class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-2xl transition-all cursor-pointer"
-              title="Видалити сповіщення"
+              class="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all cursor-pointer bg-slate-50 sm:bg-transparent"
+              title="Виделити сповіщення"
             >
               <Trash2 class="w-4 h-4" />
             </button>
@@ -367,7 +375,7 @@ const formatLogTime = (isoString) => {
 
       <div
         v-else
-        class="bg-slate-50/50 border border-dashed border-slate-200 rounded-2xl p-12 text-center flex flex-col items-center justify-center gap-2"
+        class="bg-slate-50/50 border border-dashed border-slate-200 rounded-2xl p-12 text-center flex flex-col items-center justify-center gap-2 w-full"
       >
         <div
           class="w-10 h-10 bg-slate-100 text-slate-400 rounded-xl flex items-center justify-center"
@@ -381,6 +389,7 @@ const formatLogTime = (isoString) => {
       </div>
     </div>
 
+    <!-- ================= СЕКЦІЯ 3: ФОРМА ЗМІНИ ПАРОЛЮ ================= -->
     <div v-else-if="currentSection === 'change-password'" class="space-y-6 animate-fade-in">
       <div>
         <button
