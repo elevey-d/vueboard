@@ -94,7 +94,7 @@ const handleChangePasswordSubmit = () => {
 
   if (result.success) {
     notificationStore.addNotification(
-      '🔒 Безпека: Ви успішно змінили пароль від свого облікового запису',
+      'Ви успішно змінили пароль від свого облікового запису',
       'info',
     )
     successMessage.value = 'Пароль успішно та надійно оновлено!'
@@ -285,9 +285,8 @@ const formatLogTime = (isoString) => {
       </div>
     </div>
 
-    <!-- ================= СЕКЦІЯ 2: ЖУРНАЛ АКТИВНОСТІ (ВИПРАВЛЕНИЙ НАВБАР) ================= -->
+    <!-- ================= СЕКЦІЯ 2: ЖУРНАЛ АКТИВНОСТІ (НАВБАР) ================= -->
     <div v-else-if="currentSection === 'notifications'" class="space-y-6 animate-fade-in w-full">
-      <!-- ОНОВЛЕНО: Ідеально рівна суцільна лінія навігації без громіздких фонів -->
       <div
         class="flex flex-row items-center justify-between w-full pb-3 border-b border-slate-200/60 mb-5 mt-1"
       >
@@ -365,7 +364,7 @@ const formatLogTime = (isoString) => {
             <button
               @click="notificationStore.deleteLog(log.id)"
               class="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all cursor-pointer bg-slate-50 sm:bg-transparent"
-              title="Виделити сповіщення"
+              title="Видалити сповіщення"
             >
               <Trash2 class="w-4 h-4" />
             </button>
